@@ -37,9 +37,9 @@ func Parse(projname string) {
 	cliConfig := map[string]interface{}{}
 	for name, param := range params {
 		if param.Type == INT {
-			dummy := 0
+			dummy := int64(0)
 			cliConfig[name] = &dummy
-			flag.IntVar(cliConfig[name].(*int), name, param.Default.(int), param.Description)
+			flag.Int64Var(cliConfig[name].(*int64), name, param.Default.(int64), param.Description)
 		} else {
 			dummy := ""
 			cliConfig[name] = &dummy
