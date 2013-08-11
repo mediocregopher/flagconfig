@@ -70,7 +70,7 @@ func Parse(projname string) {
 		for name, val := range configFileMap {
 			if param, ok := params[name]; ok {
 				if param.Type == INT {
-					valint, err := strconv.ParseInt(val,10,64)
+					valint, err := strconv.ParseInt(val, 10, 64)
 					if err != nil {
 						panic("field " + name + " in " + *configFile + " cannot be read as a number")
 					}
