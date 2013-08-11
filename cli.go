@@ -9,9 +9,9 @@ import (
 
 var fullConfig = map[string]interface{}{}
 
-// GetInt looks for a configuration parameter of the given name and
+// GetInt64 looks for a configuration parameter of the given name and
 // returns its value (assuming the parameter is an integer)
-func GetInt(name string) int64 {
+func GetInt64(name string) int64 {
 	val, ok := fullConfig[name]
 	if !ok {
 		panic("attempted to access non-int-parameter " + name)
