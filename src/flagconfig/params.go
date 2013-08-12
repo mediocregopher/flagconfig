@@ -20,10 +20,10 @@ func StrParam(name, descr, def string) {
 	newParam(name, descr, def, STRING)
 }
 
-// Int64Param tells flagconfig to look for a param called name of type int64 in
+// IntParam tells flagconfig to look for a param called name of type int in
 // either the config file or on the command line, or use the given default
 // instead
-func Int64Param(name, descr string, def int64) {
+func IntParam(name, descr string, def int) {
 	newParam(name, descr, def, INT)
 }
 

@@ -1,7 +1,7 @@
 package flagconfig
 
 import (
-	"flag"
+	"github.com/droundy/goopt"
 	"fmt"
 	"os"
 	"strconv"
@@ -9,14 +9,14 @@ import (
 
 var fullConfig = map[string]interface{}{}
 
-// GetInt64 looks for a configuration parameter of the given name and
+// GetInt looks for a configuration parameter of the given name and
 // returns its value (assuming the parameter is an integer)
-func GetInt64(name string) int64 {
+func GetInt(name string) int {
 	val, ok := fullConfig[name]
 	if !ok {
 		panic("attempted to access non-int-parameter " + name)
 	}
-	return val.(int64)
+	return val.(int)
 }
 
 // GetStr looks for a configuration parameter of the given name and
@@ -37,21 +37,35 @@ func Parse(projname string) {
 	cliConfig := map[string]interface{}{}
 	for name, param := range params {
 		if param.Type == INT {
-			dummy := int64(0)
-			cliConfig[name] = &dummy
-			flag.Int64Var(cliConfig[name].(*int64), name, param.Default.(int64), param.Description)
+			cliConfig[name] = goopt.Int(
+				[]string{"--"+name},
+				param.Default.(int),
+				param.Description,
+			)
 		} else {
-			dummy := ""
-			cliConfig[name] = &dummy
-			flag.StringVar(cliConfig[name].(*string), name, param.Default.(string), param.Description)
+			cliConfig[name] = goopt.String(
+				[]string{"--"+name},
+				param.Default.(string),
+				param.Description,
+			)
 		}
 	}
 
 	//Some extra cli args
-	dumpExample := flag.Bool("example", false, "Dump example configuration to stdout and exit")
-	configFile := flag.String("config", "", "Configuration file to load, empty means don't load any file and only use command-line args")
+	dumpExample := goopt.Flag(
+		[]string{"--example"},
+		[]string{},
+		"Dump example configuration to stdout and exit",
+		"",
+	)
+	configFile := goopt.String(
+		[]string{"--config"},
+		"",
+		"Configuration file to load, empty means don't load any file and only"+
+		" use command-line args",
+	)
 
-	flag.Parse()
+	goopt.Parse(nil)
 
 	//If the flag to dump example config is set to true, do that
 	if *dumpExample {
@@ -70,9 +84,10 @@ func Parse(projname string) {
 		for name, val := range configFileMap {
 			if param, ok := params[name]; ok {
 				if param.Type == INT {
-					valint, err := strconv.ParseInt(val, 10, 64)
+					valint, err := strconv.Atoi(val)
 					if err != nil {
-						panic("field " + name + " in " + *configFile + " cannot be read as a number")
+						panic("field "+name+" in "+*configFile+
+						" cannot be read as a number")
 					}
 					fullConfig[name] = valint
 				} else {
@@ -88,12 +103,12 @@ func Parse(projname string) {
 	//configs by the previous section
 	for name, param := range params {
 		if param.Type == INT {
-			cliVal := *cliConfig[name].(*int64)
+			cliVal := *cliConfig[name].(*int)
 			_, confSet := fullConfig[name]
 			if cliVal != param.Default {
 				fullConfig[name] = cliVal
 			} else if !confSet {
-				fullConfig[name] = param.Default.(int64)
+				fullConfig[name] = param.Default.(int)
 			}
 		} else {
 			cliVal := *cliConfig[name].(*string)
