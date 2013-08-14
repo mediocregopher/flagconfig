@@ -33,7 +33,7 @@ func dumpExampleConfig(projname string) string {
 			buffer.WriteString(name + ": " + def + "\n")
 			buffer.WriteString("\n")
 		} else {
-			for _,def := range param.Default.([]string) {
+			for _, def := range param.Default.([]string) {
 				buffer.WriteString(name + ": " + def + "\n")
 			}
 			buffer.WriteString("\n")
@@ -44,11 +44,11 @@ func dumpExampleConfig(projname string) string {
 }
 
 func setOrAppend(m map[string][]string, name, val string) {
-	_,ok := m[name]
+	_, ok := m[name]
 	if !ok {
-		m[name] = make([]string,0,8)
+		m[name] = make([]string, 0, 8)
 	}
-	m[name] = append(m[name],val)
+	m[name] = append(m[name], val)
 }
 
 // readConfig returns a map of the key/values found in a given configuration file.
@@ -76,7 +76,7 @@ func readConfig(file string) (map[string][]string, error) {
 			spl := strings.Split(line, ":")
 			name := strings.Trim(spl[0], " \t")
 			val := strings.Trim(spl[1], " \t")
-			setOrAppend(ret,name,val)
+			setOrAppend(ret, name, val)
 		}
 	}
 

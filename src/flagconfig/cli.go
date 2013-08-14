@@ -1,8 +1,8 @@
 package flagconfig
 
 import (
-	"github.com/droundy/goopt"
 	"fmt"
+	"github.com/droundy/goopt"
 	"os"
 	"strconv"
 )
@@ -48,19 +48,19 @@ func Parse(projname string) {
 	for name, param := range params {
 		if param.Type == INT {
 			cliConfig[name] = goopt.Int(
-				[]string{"--"+name},
+				[]string{"--" + name},
 				param.Default.(int),
 				param.Description,
 			)
 		} else if param.Type == STRING {
 			cliConfig[name] = goopt.String(
-				[]string{"--"+name},
+				[]string{"--" + name},
 				param.Default.(string),
 				param.Description,
 			)
 		} else {
 			cliConfig[name] = goopt.Strings(
-				[]string{"--"+name},
+				[]string{"--" + name},
 				"<string>",
 				param.Description,
 			)
@@ -78,7 +78,7 @@ func Parse(projname string) {
 		[]string{"--config"},
 		"",
 		"Configuration file to load, empty means don't load any file and only"+
-		" use command-line args",
+			" use command-line args",
 	)
 
 	goopt.Parse(nil)
@@ -108,15 +108,15 @@ func Parse(projname string) {
 		for name, val := range configFileMap {
 			if param, ok := params[name]; ok {
 				if param.Type != STRINGS && len(val) > 1 {
-					panic("field "+name+" in "+*configFile+
-					" cannot have multiple values")
+					panic("field " + name + " in " + *configFile +
+						" cannot have multiple values")
 				}
 
 				if param.Type == INT {
 					valint, err := strconv.Atoi(val[0])
 					if err != nil {
-						panic("field "+name+" in "+*configFile+
-						" cannot be read as a number")
+						panic("field " + name + " in " + *configFile +
+							" cannot be read as a number")
 					}
 					fullConfig[name] = valint
 				} else if param.Type == STRING {
@@ -152,7 +152,7 @@ func Parse(projname string) {
 		} else {
 			cliVal := *cliConfig[name].(*[]string)
 			_, confSet := fullConfig[name]
-			if !stringSlicesEqual(cliVal,param.Default.([]string)) {
+			if !stringSlicesEqual(cliVal, param.Default.([]string)) {
 				fullConfig[name] = cliVal
 			} else if !confSet {
 				fullConfig[name] = param.Default.([]string)

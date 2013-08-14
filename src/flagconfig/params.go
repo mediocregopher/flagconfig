@@ -27,7 +27,7 @@ func StrParam(name, descr, def string) {
 // other. For example, if there are three defined in the config file and one
 // defined on the command-line, that one will be the only one in the returned
 // value.
-func StrParams(name, descr string, def ... string) {
+func StrParams(name, descr string, def ...string) {
 	newParam(name, descr, def, STRINGS)
 }
 
