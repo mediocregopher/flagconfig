@@ -29,6 +29,16 @@ func GetStr(name string) string {
 	return val.(string)
 }
 
+// GetStr looks for a configuration parameter of the given name and returns its
+// value (assuming the parameter is a list of strings)
+func GetStrs(name string) []string {
+	val, ok := fullConfig[name]
+	if !ok {
+		panic("attempted to access non-str-slice-parameter " + name)
+	}
+	return val.([]string)
+}
+
 // Pars loads flagconfig's runtime configuration, using both command-line arguments
 // and a possible configuration file
 func Parse(projname string) {
@@ -42,10 +52,16 @@ func Parse(projname string) {
 				param.Default.(int),
 				param.Description,
 			)
-		} else {
+		} else if param.Type == STRING {
 			cliConfig[name] = goopt.String(
 				[]string{"--"+name},
 				param.Default.(string),
+				param.Description,
+			)
+		} else {
+			cliConfig[name] = goopt.Strings(
+				[]string{"--"+name},
+				"<string>",
 				param.Description,
 			)
 		}
@@ -67,6 +83,14 @@ func Parse(projname string) {
 
 	goopt.Parse(nil)
 
+	// Check if any of the multiple arg params didn't have any cli's set, and
+	// therefore should have the default set
+	for name, param := range params {
+		if param.Type == STRINGS && len(*cliConfig[name].(*[]string)) < 1 {
+			*cliConfig[name].(*[]string) = param.Default.([]string)
+		}
+	}
+
 	//If the flag to dump example config is set to true, do that
 	if *dumpExample {
 		fmt.Print(dumpExampleConfig(projname))
@@ -83,13 +107,20 @@ func Parse(projname string) {
 
 		for name, val := range configFileMap {
 			if param, ok := params[name]; ok {
+				if param.Type != STRINGS && len(val) > 1 {
+					panic("field "+name+" in "+*configFile+
+					" cannot have multiple values")
+				}
+
 				if param.Type == INT {
-					valint, err := strconv.Atoi(val)
+					valint, err := strconv.Atoi(val[0])
 					if err != nil {
 						panic("field "+name+" in "+*configFile+
 						" cannot be read as a number")
 					}
 					fullConfig[name] = valint
+				} else if param.Type == STRING {
+					fullConfig[name] = val[0]
 				} else {
 					fullConfig[name] = val
 				}
@@ -110,7 +141,7 @@ func Parse(projname string) {
 			} else if !confSet {
 				fullConfig[name] = param.Default.(int)
 			}
-		} else {
+		} else if param.Type == STRING {
 			cliVal := *cliConfig[name].(*string)
 			_, confSet := fullConfig[name]
 			if cliVal != param.Default {
@@ -118,7 +149,29 @@ func Parse(projname string) {
 			} else if !confSet {
 				fullConfig[name] = param.Default.(string)
 			}
+		} else {
+			cliVal := *cliConfig[name].(*[]string)
+			_, confSet := fullConfig[name]
+			if !stringSlicesEqual(cliVal,param.Default.([]string)) {
+				fullConfig[name] = cliVal
+			} else if !confSet {
+				fullConfig[name] = param.Default.([]string)
+			}
 		}
 	}
 
+}
+
+func stringSlicesEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
 }
