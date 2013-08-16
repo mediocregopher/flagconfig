@@ -73,9 +73,12 @@ func readConfig(file string) (map[string][]string, error) {
 
 		line = strings.TrimRight(line, "\n")
 		if len(line) > 0 && line[0] != '#' {
-			spl := strings.Split(line, ":")
-			name := strings.Trim(spl[0], " \t")
-			val := strings.Trim(spl[1], " \t")
+			idx := strings.Index(line, ":")
+			if idx < 0 {
+				continue
+			}
+			name := strings.Trim(line[0:idx], " \t")
+			val := strings.Trim(line[idx+1:], " \t")
 			setOrAppend(ret, name, val)
 		}
 	}
