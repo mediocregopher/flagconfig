@@ -38,6 +38,8 @@ func GetStrs(name string) []string {
 // Parse loads flagconfig's runtime configuration, using both command-line
 // arguments and a possible configuration file
 func Parse(projname string) error {
+	fullConfig = map[string]params.Param{}
+
 	for _,param := range fullConfig {
 		param.CLA()
 	}
