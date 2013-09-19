@@ -2,6 +2,7 @@
 
 A very simple library for specifying parameters and their default values and
 having them be read in from either the command-line or a configuration file.
+Also does auto-generation of configuration files with default values set.
 
 # Installation
 
