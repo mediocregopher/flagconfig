@@ -73,6 +73,21 @@ func (f *FlagConfig) GetStrs(name string) []string {
 	return f.get(name).Value().([]string)
 }
 
+// FlagParam tells flagconfig to look for a param called name on the command
+// line or in the config file. Passing the flag on the command-line indicates a
+// value of whatever the opposite of the default is (so if the default is false,
+// passing it on the command-line would mean true). In the configuration file
+// the value can be either "true" or "false".
+func (f *FlagConfig) FlagParam(name, descr string, def bool) {
+	f.fullConfig[name] = params.NewFlag(name, descr, def, false)
+}
+
+// GetFlag looks for a configuration parameter of the given name and returns its
+// value (assuming the parameter is a flag).
+func (f *FlagConfig) GetFlag(name string) bool {
+	return f.get(name).Value().(bool)
+}
+
 // Parse loads flagconfig's runtime configuration, using both command-line
 // arguments and a possible configuration file
 func (f *FlagConfig) Parse() error {
