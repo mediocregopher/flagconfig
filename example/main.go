@@ -1,25 +1,29 @@
 package main
 
 import (
-	"flagconfig"
+	"github.com/mediocregopher/flagconfig/src/flagconfig"
 	"fmt"
 )
 
 func main() {
+
+	//Create new flagconfig object
+	FC := flagconfig.New("flagconfigtest")
+
 	//Specify the parameters we want to fetch
-	flagconfig.StrParam("foo","Some foo","foofoofoo")
-	flagconfig.IntParam("bar","Some bar",64)
-	flagconfig.StrParams("baz","Some baz","a","b","c")
+	FC.StrParam("foo","Some foo","foofoofoo")
+	FC.IntParam("bar","Some bar",64)
+	FC.StrParams("baz","Some baz","a","b","c")
 
 	//Parse command line and possibly config file
-	err := flagconfig.Parse("flagconfigtest")
+	err := FC.Parse()
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
 	//Display the values that have been parsed
-	fmt.Println(flagconfig.GetStr("foo"))
-	fmt.Println(flagconfig.GetInt("bar"))
-	fmt.Println(flagconfig.GetStrs("baz"))
+	fmt.Println(FC.GetStr("foo"))
+	fmt.Println(FC.GetInt("bar"))
+	fmt.Println(FC.GetStrs("baz"))
 }

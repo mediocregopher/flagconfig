@@ -10,7 +10,7 @@ import (
 
 // dumpExampleConfig returns the string representation of a configuration file
 // with all parameters filled in with their default values
-func dumpExampleConfig(projname string) string {
+func (f *FlagConfig) dumpExampleConfig(projname string) string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString("\n")
@@ -19,7 +19,7 @@ func dumpExampleConfig(projname string) string {
 	buffer.WriteString("#####################################\n")
 	buffer.WriteString("\n")
 
-	for name, param := range fullConfig {
+	for name, param := range f.fullConfig {
 		buffer.WriteString("# " + param.Description() + "\n")
 		if defaults,ok := param.DefaultAsStrings(); ok {
 			for i := range defaults {
