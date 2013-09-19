@@ -1,15 +1,15 @@
 package params
 
 import (
-	"github.com/droundy/goopt"
 	"errors"
+	"github.com/droundy/goopt"
 )
 
 type stringsParam struct {
-	name, description string
+	name, description   string
 	defaultVal, confVal []string
-	cliVal *[]string
-	finalVal []string
+	cliVal              *[]string
+	finalVal            []string
 }
 
 func NewStrings(name, description string, def []string, required bool) *stringsParam {
@@ -18,9 +18,9 @@ func NewStrings(name, description string, def []string, required bool) *stringsP
 		defVal = def
 	}
 	return &stringsParam{
-		name: name,
+		name:        name,
 		description: description,
-		defaultVal: defVal,
+		defaultVal:  defVal,
 	}
 }
 
@@ -32,7 +32,7 @@ func (p *stringsParam) Description() string {
 	return p.description
 }
 
-func (p *stringsParam) DefaultAsStrings() ([]string,bool) {
+func (p *stringsParam) DefaultAsStrings() ([]string, bool) {
 	return p.defaultVal, p.defaultVal != nil
 }
 
@@ -46,14 +46,14 @@ func (p *stringsParam) CLA() {
 
 func (p *stringsParam) ConfFile(val string) {
 	if p.confVal == nil {
-		p.confVal = make([]string,0,4)
+		p.confVal = make([]string, 0, 4)
 	}
-	p.confVal = append(p.confVal,val)
+	p.confVal = append(p.confVal, val)
 }
 
 func (p *stringsParam) Post() error {
 	cliSet := p.cliVal != nil && *p.cliVal != nil && len(*p.cliVal) > 0
-	if cliSet && !stringSlicesEqual(*p.cliVal,p.defaultVal) {
+	if cliSet && !stringSlicesEqual(*p.cliVal, p.defaultVal) {
 		p.finalVal = *p.cliVal
 	} else if p.confVal != nil {
 		p.finalVal = p.confVal
@@ -66,7 +66,7 @@ func (p *stringsParam) Post() error {
 	return nil
 }
 
-func stringSlicesEqual (a, b []string) bool {
+func stringSlicesEqual(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}

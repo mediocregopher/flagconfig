@@ -1,15 +1,15 @@
 package params
 
 import (
+	"errors"
 	"github.com/droundy/goopt"
 	"strconv"
-	"errors"
 )
 
 type intParam struct {
-	name, description string
+	name, description           string
 	defaultVal, cliVal, confVal *int
-	finalVal int
+	finalVal                    int
 }
 
 func NewInt(name, description string, def int, required bool) *intParam {
@@ -19,9 +19,9 @@ func NewInt(name, description string, def int, required bool) *intParam {
 		*defVal = def
 	}
 	return &intParam{
-		name: name,
+		name:        name,
 		description: description,
-		defaultVal: defVal,
+		defaultVal:  defVal,
 	}
 }
 
@@ -33,11 +33,11 @@ func (p *intParam) Description() string {
 	return p.description
 }
 
-func (p *intParam) DefaultAsStrings() ([]string,bool) {
+func (p *intParam) DefaultAsStrings() ([]string, bool) {
 	if p.defaultVal != nil {
-		return []string{strconv.Itoa(*p.defaultVal)},true
+		return []string{strconv.Itoa(*p.defaultVal)}, true
 	} else {
-		return nil,false
+		return nil, false
 	}
 }
 

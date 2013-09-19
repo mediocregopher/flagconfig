@@ -14,7 +14,7 @@ type Param interface {
 
 	// The default value (or multiple values) of the parameter as a string, with
 	// a boolean to indicate if it even has one
-	DefaultAsStrings() ([]string,bool)
+	DefaultAsStrings() ([]string, bool)
 
 	// Make the appropriate call to the CLA handler for this param. The handler
 	// will probably return a pointer of some sort which will be populated once

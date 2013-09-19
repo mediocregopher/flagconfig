@@ -1,14 +1,14 @@
 package params
 
 import (
-	"github.com/droundy/goopt"
 	"errors"
+	"github.com/droundy/goopt"
 )
 
 type stringParam struct {
-	name, description string
+	name, description           string
 	defaultVal, cliVal, confVal *string
-	finalVal string
+	finalVal                    string
 }
 
 func NewString(name, description string, def string, required bool) *stringParam {
@@ -18,9 +18,9 @@ func NewString(name, description string, def string, required bool) *stringParam
 		*defVal = def
 	}
 	return &stringParam{
-		name: name,
+		name:        name,
 		description: description,
-		defaultVal: defVal,
+		defaultVal:  defVal,
 	}
 }
 
@@ -32,11 +32,11 @@ func (p *stringParam) Description() string {
 	return p.description
 }
 
-func (p *stringParam) DefaultAsStrings() ([]string,bool) {
+func (p *stringParam) DefaultAsStrings() ([]string, bool) {
 	if p.defaultVal != nil {
-		return []string{*p.defaultVal},true
+		return []string{*p.defaultVal}, true
 	} else {
-		return nil,false
+		return nil, false
 	}
 }
 

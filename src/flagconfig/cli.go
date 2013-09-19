@@ -3,12 +3,12 @@ package flagconfig
 import (
 	"fmt"
 	"github.com/droundy/goopt"
-	"os"
 	"github.com/mediocregopher/flagconfig/src/flagconfig/params"
+	"os"
 )
 
 type FlagConfig struct {
-	projname string
+	projname   string
 	fullConfig map[string]params.Param
 }
 
@@ -18,7 +18,7 @@ type FlagConfig struct {
 //	* Get found parameters using GetStr, GetInt, etc...
 func New(projname string) *FlagConfig {
 	return &FlagConfig{
-		projname: projname,
+		projname:   projname,
 		fullConfig: map[string]params.Param{},
 	}
 }
@@ -77,7 +77,7 @@ func (f *FlagConfig) GetStrs(name string) []string {
 // arguments and a possible configuration file
 func (f *FlagConfig) Parse() error {
 
-	for _,param := range f.fullConfig {
+	for _, param := range f.fullConfig {
 		param.CLA()
 	}
 
@@ -109,7 +109,7 @@ func (f *FlagConfig) Parse() error {
 			return err
 		}
 
-		for _,param := range f.fullConfig {
+		for _, param := range f.fullConfig {
 			if vals, ok := configFileMap[param.Name()]; ok {
 				for i := range vals {
 					param.ConfFile(vals[i])
