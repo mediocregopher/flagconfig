@@ -12,7 +12,11 @@ func main() {
 	flagconfig.StrParams("baz","Some baz","a","b","c")
 
 	//Parse command line and possibly config file
-	flagconfig.Parse("flagconfigtest")
+	err := flagconfig.Parse("flagconfigtest")
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 
 	//Display the values that have been parsed
 	fmt.Println(flagconfig.GetStr("foo"))

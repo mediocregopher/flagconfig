@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -20,32 +19,22 @@ func dumpExampleConfig(projname string) string {
 	buffer.WriteString("#####################################\n")
 	buffer.WriteString("\n")
 
-	for name, param := range params {
-		buffer.WriteString("# " + param.Description + "\n")
-
-		var def string
-		if param.Type == STRING {
-			def = param.Default.(string)
-			buffer.WriteString(name + ": " + def + "\n")
-			buffer.WriteString("\n")
-		} else if param.Type == INT {
-			def = strconv.Itoa(param.Default.(int))
-			buffer.WriteString(name + ": " + def + "\n")
-			buffer.WriteString("\n")
-		} else {
-			for _, def := range param.Default.([]string) {
-				buffer.WriteString(name + ": " + def + "\n")
+	for name, param := range fullConfig {
+		buffer.WriteString("# " + param.Description() + "\n")
+		if defaults,ok := param.DefaultAsStrings(); ok {
+			for i := range defaults {
+				buffer.WriteString(name + ": " + defaults[i] + "\n")
 			}
-			buffer.WriteString("\n")
+		} else {
+				buffer.WriteString(name + ": <required>\n")
 		}
-
+		buffer.WriteString("\n")
 	}
 	return buffer.String()
 }
 
 func setOrAppend(m map[string][]string, name, val string) {
-	_, ok := m[name]
-	if !ok {
+	if _, ok := m[name]; !ok {
 		m[name] = make([]string, 0, 8)
 	}
 	m[name] = append(m[name], val)
