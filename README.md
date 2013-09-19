@@ -9,7 +9,10 @@ Also does auto-generation of configuration files with default values set.
 Goatfile:
 ```json
 {
-    "loc":"github.com/mediocregopher/flagconfig"
+    "loc":"https://github.com/mediocregopher/flagconfig.git",
+    "type":"git",
+    "reference":"v0.1.0",
+    "path":"github.com/mediocregopher/flagconfig"
 }
 ```
 
@@ -19,5 +22,8 @@ go get github.com/mediocregopher/flagconfig
 ```
 
 # Usage
+
+Godocs can be found
+[here](http://godoc.org/github.com/mediocregopher/flagconfig/src/flagconfig)
 
 See the [example](/example) for basic usage.
