@@ -10,10 +10,17 @@ func main() {
 	//Create new flagconfig object
 	FC := flagconfig.New("flagconfigtest")
 
+	//Optionally set a description that'll show up in the command-line help
+	FC.SetDescription("A super cool test program")
+
 	//Specify the parameters we want to fetch
 	FC.StrParam("foo","Some foo","foofoofoo")
 	FC.IntParam("bar","Some bar",64)
 	FC.StrParams("baz","Some baz","a","b","c")
+	FC.FlagParam("bax", "Some bax", false)
+
+	//Optionally set a message to show up at the end of the --help message
+	FC.SetExtraHelp("Thanks for reading the --help message!")
 
 	//Parse command line and possibly config file
 	err := FC.Parse()
@@ -26,4 +33,5 @@ func main() {
 	fmt.Println(FC.GetStr("foo"))
 	fmt.Println(FC.GetInt("bar"))
 	fmt.Println(FC.GetStrs("baz"))
+	fmt.Println(FC.GetFlag("bax"))
 }

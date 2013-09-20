@@ -16,11 +16,15 @@ type Param interface {
 	// a boolean to indicate if it even has one
 	DefaultAsStrings() ([]string, bool)
 
-	// Make the appropriate call to the CLA handler for this param. The handler
-	// will probably return a pointer of some sort which will be populated once
-	// the handler's Parse method is called (which will be after this is called
-	// on all defined parameters).  This pointer should be stored.
-	CLA()
+	// Whether or not this parameter would have an associated value on the
+	// command line. For instance a string parameter would, a flag would not.
+	CLAHasValue() bool
+
+	// When parsing the command-line args this is called with the value attached
+	// to any key which matches Name(). This could be called multiple times. If
+	// the key has no value (in the case of a Flag, for example) then this will
+	// be called with a blank string
+	CLA(string)
 
 	// When parsing the conf file (if given) this is called with the value
 	// attached to any key which matches Name(). This could be called multiple

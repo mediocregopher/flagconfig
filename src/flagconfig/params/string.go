@@ -2,7 +2,6 @@ package params
 
 import (
 	"errors"
-	"github.com/droundy/goopt"
 )
 
 type stringParam struct {
@@ -34,22 +33,19 @@ func (p *stringParam) Description() string {
 
 func (p *stringParam) DefaultAsStrings() ([]string, bool) {
 	if p.defaultVal != nil {
-		return []string{*p.defaultVal}, true
+		return []string{"\""+*p.defaultVal+"\""}, true
 	} else {
 		return nil, false
 	}
 }
 
-func (p *stringParam) CLA() {
-	d := ""
-	if p.defaultVal != nil {
-		d = *p.defaultVal
-	}
-	p.cliVal = goopt.String(
-		[]string{"--" + p.name},
-		d,
-		p.description,
-	)
+func (p *stringParam) CLAHasValue() bool {
+	return true
+}
+
+func (p *stringParam) CLA(val string) {
+	p.cliVal = new(string)
+	*p.cliVal = val
 }
 
 func (p *stringParam) ConfFile(val string) {
@@ -58,7 +54,7 @@ func (p *stringParam) ConfFile(val string) {
 }
 
 func (p *stringParam) Post() error {
-	if p.cliVal != nil && *p.cliVal != *p.defaultVal {
+	if p.cliVal != nil {
 		p.finalVal = *p.cliVal
 	} else if p.confVal != nil {
 		p.finalVal = *p.confVal

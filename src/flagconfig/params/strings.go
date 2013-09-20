@@ -2,13 +2,11 @@ package params
 
 import (
 	"errors"
-	"github.com/droundy/goopt"
 )
 
 type stringsParam struct {
 	name, description   string
-	defaultVal, confVal []string
-	cliVal              *[]string
+	defaultVal, cliVal, confVal []string
 	finalVal            []string
 }
 
@@ -33,15 +31,26 @@ func (p *stringsParam) Description() string {
 }
 
 func (p *stringsParam) DefaultAsStrings() ([]string, bool) {
-	return p.defaultVal, p.defaultVal != nil
+	if p.defaultVal != nil {
+		defs := make([]string,len(p.defaultVal))
+		for i := range p.defaultVal {
+			defs[i] = "\""+p.defaultVal[i]+"\""
+		}
+		return defs,true
+	} else {
+		return nil,false
+	}
 }
 
-func (p *stringsParam) CLA() {
-	p.cliVal = goopt.Strings(
-		[]string{"--" + p.name},
-		"<string>",
-		p.description,
-	)
+func (p *stringsParam) CLAHasValue() bool {
+	return true
+}
+
+func (p *stringsParam) CLA(val string) {
+	if p.cliVal == nil {
+		p.cliVal = make([]string, 0, 4)
+	}
+	p.cliVal = append(p.cliVal, val)
 }
 
 func (p *stringsParam) ConfFile(val string) {
@@ -52,9 +61,8 @@ func (p *stringsParam) ConfFile(val string) {
 }
 
 func (p *stringsParam) Post() error {
-	cliSet := p.cliVal != nil && *p.cliVal != nil && len(*p.cliVal) > 0
-	if cliSet && !stringSlicesEqual(*p.cliVal, p.defaultVal) {
-		p.finalVal = *p.cliVal
+	if p.cliVal != nil {
+		p.finalVal = p.cliVal
 	} else if p.confVal != nil {
 		p.finalVal = p.confVal
 	} else if p.defaultVal != nil {
@@ -64,20 +72,6 @@ func (p *stringsParam) Post() error {
 	}
 
 	return nil
-}
-
-func stringSlicesEqual(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-
-	return true
 }
 
 func (p *stringsParam) Value() interface{} {

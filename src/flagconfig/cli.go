@@ -2,13 +2,18 @@ package flagconfig
 
 import (
 	"fmt"
-	"github.com/droundy/goopt"
-	"github.com/mediocregopher/flagconfig/src/flagconfig/params"
 	"os"
+	"github.com/mediocregopher/flagconfig/src/flagconfig/params"
+	"github.com/mediocregopher/flagconfig/src/flagconfig/cla"
+	"strings"
+	"text/tabwriter"
+	"bytes"
 )
 
 type FlagConfig struct {
-	projname   string
+	projname string
+	projdescr string
+	projpostdescr string
 	fullConfig map[string]params.Param
 }
 
@@ -18,9 +23,21 @@ type FlagConfig struct {
 //	* Get found parameters using GetStr, GetInt, etc...
 func New(projname string) *FlagConfig {
 	return &FlagConfig{
-		projname:   projname,
+		projname: projname,
 		fullConfig: map[string]params.Param{},
 	}
+}
+
+// SetDescription sets the description which will be shown above the flag usage
+// when --help is called on the command-line. This is optional.
+func (f *FlagConfig) SetDescription(descr string) {
+	f.projdescr = descr
+}
+
+// SetExtraHelp sets a string which will show up at the tail end of the --help
+// message, after all flags are defined. This is optional.
+func (f *FlagConfig) SetExtraHelp(help string) {
+	f.projpostdescr = help
 }
 
 func (f *FlagConfig) get(name string) params.Param {
@@ -79,7 +96,7 @@ func (f *FlagConfig) GetStrs(name string) []string {
 // passing it on the command-line would mean true). In the configuration file
 // the value can be either "true" or "false".
 func (f *FlagConfig) FlagParam(name, descr string, def bool) {
-	f.fullConfig[name] = params.NewFlag(name, descr, def, false)
+	f.fullConfig[name] = params.NewFlag(name, descr, def)
 }
 
 // GetFlag looks for a configuration parameter of the given name and returns its
@@ -92,43 +109,68 @@ func (f *FlagConfig) GetFlag(name string) bool {
 // arguments and a possible configuration file
 func (f *FlagConfig) Parse() error {
 
-	for _, param := range f.fullConfig {
-		param.CLA()
-	}
-
-	//Some extra cli args
-	dumpExample := goopt.Flag(
-		[]string{"--example"},
-		[]string{},
-		"Dump example configuration to stdout and exit",
-		"",
+	f.FlagParam(
+		"help",
+		"Display help for parameters",
+		false,
 	)
-	configFile := goopt.String(
-		[]string{"--config"},
-		"",
+
+	f.FlagParam(
+		"example",
+		"Dump example configuration to stdout and exit",
+		false,
+	)
+
+	f.StrParam(
+		"config",
 		"Configuration file to load, empty means don't load any file and only"+
 			" use command-line args",
+		"",
 	)
 
-	goopt.Parse(nil)
+	claMap := cla.Parse(f.fullConfig)
+	_, printHelp := claMap["help"]
+	_, printExample := claMap["example"]
+	
+	var configFile string
+	if configFiles, ok := claMap["config"]; ok && len(configFiles) > 0 {
+		configFile = configFiles[0]
+	}
+
+	delete(f.fullConfig, "help")
+	delete(f.fullConfig, "example")
+	delete(f.fullConfig, "config")
+
+	if printHelp {
+		fmt.Println(f.Help())
+		os.Exit(0)
+	}
 
 	//If the flag to dump example config is set to true, do that
-	if *dumpExample {
+	if printExample {
 		fmt.Print(f.dumpExampleConfig(f.projname))
 		os.Exit(0)
 	}
 
-	if *configFile != "" {
-		configFileMap, err := readConfig(*configFile)
+	if configFile != "" {
+		configFileMap, err := readConfig(configFile)
 		if err != nil {
 			return err
 		}
 
-		for _, param := range f.fullConfig {
+		for _,param := range f.fullConfig {
 			if vals, ok := configFileMap[param.Name()]; ok {
 				for i := range vals {
 					param.ConfFile(vals[i])
 				}
+			}
+		}
+	}
+
+	for name, param := range f.fullConfig {
+		if vals, ok := claMap[name]; ok {
+			for i := range vals {
+				param.CLA(vals[i])
 			}
 		}
 	}
@@ -144,4 +186,41 @@ func (f *FlagConfig) Parse() error {
 	}
 
 	return nil
+}
+
+// Returns a formatted help string for the parameters that have been given so
+// far
+func (f *FlagConfig) Help() string  {
+	buf := bytes.NewBuffer(make([]byte,256))
+
+	fmt.Fprintf(buf, "Usage: %s [FLAGS]\n",os.Args[0])
+
+	if f.projdescr != "" {
+		fmt.Fprintf(buf,"%s\n",f.projdescr)
+	}
+
+	fmt.Fprintf(buf,"\n");
+
+	w := new(tabwriter.Writer)
+	w.Init(buf, 0, 8, 0, '\t', 0)
+
+	fmtStr := "%s\t%s\t%s\n"
+	fmt.Fprintf(w,fmtStr,"Flag","Default(s)","Description")
+	fmt.Fprintf(w,fmtStr,"~~~~","~~~~~~~~~~","~~~~~~~~~~~")
+
+	for name, param := range f.fullConfig {
+		defj := "<required>"
+		if defs,ok := param.DefaultAsStrings(); ok {
+			defj = strings.Join(defs,",")
+		}
+		fmt.Fprintf(w, fmtStr, "--"+name, defj, param.Description())
+	}
+
+	w.Flush()
+
+	if f.projpostdescr != "" {
+		fmt.Fprintf(buf, "\n%s\n", f.projpostdescr)
+	}
+
+	return buf.String()
 }

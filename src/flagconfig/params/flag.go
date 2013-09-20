@@ -11,12 +11,9 @@ type flagParam struct {
 	finalVal                    bool
 }
 
-func NewFlag(name, description string, def bool, required bool) *flagParam {
-	var defVal *bool
-	if !required {
-		defVal = new(bool)
-		*defVal = def
-	}
+func NewFlag(name, description string, def bool) *flagParam {
+	defVal := new(bool)
+	*defVal = def
 	return &flagParam{
 		name:        name,
 		description: description,
@@ -48,7 +45,9 @@ func (p *flagParam) CLAHasValue() bool {
 	return false
 }
 
-func (p *flagParam) CLA() {
+func (p *flagParam) CLA(v string) {
+	p.cliVal = new(bool)
+	*p.cliVal = !*p.defaultVal
 }
 
 func (p *flagParam) ConfFile(val string) {
@@ -62,7 +61,7 @@ func (p *flagParam) ConfFile(val string) {
 }
 
 func (p *flagParam) Post() error {
-	if p.cliVal != nil && *p.cliVal != *p.defaultVal {
+	if p.cliVal != nil {
 		p.finalVal = *p.cliVal
 	} else if p.confVal != nil {
 		p.finalVal = *p.confVal

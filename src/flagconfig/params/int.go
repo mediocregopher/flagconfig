@@ -2,7 +2,6 @@ package params
 
 import (
 	"errors"
-	"github.com/droundy/goopt"
 	"strconv"
 )
 
@@ -41,16 +40,15 @@ func (p *intParam) DefaultAsStrings() ([]string, bool) {
 	}
 }
 
-func (p *intParam) CLA() {
-	d := 0
-	if p.defaultVal != nil {
-		d = *p.defaultVal
+func (p *intParam) CLAHasValue() bool {
+	return true
+}
+
+func (p *intParam) CLA(s string) {
+	if si, err := strconv.Atoi(s); err == nil {
+		p.cliVal = new(int)
+		*p.cliVal = si
 	}
-	p.cliVal = goopt.Int(
-		[]string{"--" + p.name},
-		d,
-		p.description,
-	)
 }
 
 func (p *intParam) ConfFile(val string) {
@@ -61,7 +59,7 @@ func (p *intParam) ConfFile(val string) {
 }
 
 func (p *intParam) Post() error {
-	if p.cliVal != nil && *p.cliVal != *p.defaultVal {
+	if p.cliVal != nil {
 		p.finalVal = *p.cliVal
 	} else if p.confVal != nil {
 		p.finalVal = *p.confVal
