@@ -68,6 +68,22 @@ func (f *FlagConfig) GetInt(name string) int {
 	return f.get(name).Value().(int)
 }
 
+// IntParams tells flagconfig to look for zero or more parameters of type int in
+// either the config file or on the command line, or use the given default
+// instead. If any are defined in one location they overwrite all from the
+// other. For example, if there are three defined in the config file and one
+// defined on the command-line, that one will be the only one in the returned
+// value.
+func (f *FlagConfig) IntParams(name, descr string, defaults ...int) {
+	f.fullConfig[name] = params.NewInts(name, descr, defaults)
+}
+
+// GetInts looks for a configuration parameter of the given name and returns its
+// value (assuming the parameter is a list of strings)
+func (f *FlagConfig) GetInts(name string) []int {
+	return f.get(name).Value().([]int)
+}
+
 // StrParam tells flagconfig to look for a param called name of type string in
 // either the config file or on the command line, or use the given default
 // instead
