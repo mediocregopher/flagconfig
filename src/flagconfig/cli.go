@@ -1,20 +1,20 @@
 package flagconfig
 
 import (
+	"bytes"
 	"fmt"
-	"os"
-	"github.com/mediocregopher/flagconfig/src/flagconfig/params"
 	"github.com/mediocregopher/flagconfig/src/flagconfig/cla"
+	"github.com/mediocregopher/flagconfig/src/flagconfig/params"
+	"os"
 	"strings"
 	"text/tabwriter"
-	"bytes"
 )
 
 type FlagConfig struct {
-	projname string
-	projdescr string
+	projname      string
+	projdescr     string
 	projpostdescr string
-	fullConfig map[string]params.Param
+	fullConfig    map[string]params.Param
 }
 
 // New returns a FlagConfig struct. Usage of this struct is:
@@ -23,7 +23,7 @@ type FlagConfig struct {
 //	* Get found parameters using GetStr, GetInt, etc...
 func New(projname string) *FlagConfig {
 	return &FlagConfig{
-		projname: projname,
+		projname:   projname,
 		fullConfig: map[string]params.Param{},
 	}
 }
@@ -131,7 +131,7 @@ func (f *FlagConfig) Parse() error {
 	claMap := cla.Parse(f.fullConfig)
 	_, printHelp := claMap["help"]
 	_, printExample := claMap["example"]
-	
+
 	var configFile string
 	if configFiles, ok := claMap["config"]; ok && len(configFiles) > 0 {
 		configFile = configFiles[0]
@@ -158,7 +158,7 @@ func (f *FlagConfig) Parse() error {
 			return err
 		}
 
-		for _,param := range f.fullConfig {
+		for _, param := range f.fullConfig {
 			if vals, ok := configFileMap[param.Name()]; ok {
 				for i := range vals {
 					param.ConfFile(vals[i])
@@ -190,28 +190,28 @@ func (f *FlagConfig) Parse() error {
 
 // Returns a formatted help string for the parameters that have been given so
 // far
-func (f *FlagConfig) Help() string  {
-	buf := bytes.NewBuffer(make([]byte,256))
+func (f *FlagConfig) Help() string {
+	buf := bytes.NewBuffer(make([]byte, 256))
 
-	fmt.Fprintf(buf, "Usage: %s [FLAGS]\n",os.Args[0])
+	fmt.Fprintf(buf, "Usage: %s [FLAGS]\n", os.Args[0])
 
 	if f.projdescr != "" {
-		fmt.Fprintf(buf,"%s\n",f.projdescr)
+		fmt.Fprintf(buf, "%s\n", f.projdescr)
 	}
 
-	fmt.Fprintf(buf,"\n");
+	fmt.Fprintf(buf, "\n")
 
 	w := new(tabwriter.Writer)
 	w.Init(buf, 0, 8, 0, '\t', 0)
 
 	fmtStr := "%s\t%s\t%s\n"
-	fmt.Fprintf(w,fmtStr,"Flag","Default(s)","Description")
-	fmt.Fprintf(w,fmtStr,"~~~~","~~~~~~~~~~","~~~~~~~~~~~")
+	fmt.Fprintf(w, fmtStr, "Flag", "Default(s)", "Description")
+	fmt.Fprintf(w, fmtStr, "~~~~", "~~~~~~~~~~", "~~~~~~~~~~~")
 
 	for name, param := range f.fullConfig {
 		defj := "<required>"
-		if defs,ok := param.DefaultAsStrings(); ok {
-			defj = strings.Join(defs,",")
+		if defs, ok := param.DefaultAsStrings(); ok {
+			defj = strings.Join(defs, ",")
 		}
 		fmt.Fprintf(w, fmtStr, "--"+name, defj, param.Description())
 	}

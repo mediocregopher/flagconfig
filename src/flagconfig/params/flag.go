@@ -77,4 +77,3 @@ func (p *flagParam) Post() error {
 func (p *flagParam) Value() interface{} {
 	return p.finalVal
 }
-

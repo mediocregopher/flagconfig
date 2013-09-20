@@ -5,9 +5,9 @@ import (
 )
 
 type stringsParam struct {
-	name, description   string
+	name, description           string
 	defaultVal, cliVal, confVal []string
-	finalVal            []string
+	finalVal                    []string
 }
 
 func NewStrings(name, description string, def []string, required bool) *stringsParam {
@@ -32,13 +32,13 @@ func (p *stringsParam) Description() string {
 
 func (p *stringsParam) DefaultAsStrings() ([]string, bool) {
 	if p.defaultVal != nil {
-		defs := make([]string,len(p.defaultVal))
+		defs := make([]string, len(p.defaultVal))
 		for i := range p.defaultVal {
-			defs[i] = "\""+p.defaultVal[i]+"\""
+			defs[i] = "\"" + p.defaultVal[i] + "\""
 		}
-		return defs,true
+		return defs, true
 	} else {
-		return nil,false
+		return nil, false
 	}
 }
 
