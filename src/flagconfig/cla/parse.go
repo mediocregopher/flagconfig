@@ -26,7 +26,16 @@ func setAppend(r map[string][]string, k, v string) {
 	r[k] = append(r[k], v)
 }
 
-func Parse(fullConfig map[string]params.Param) map[string][]string {
+func getParam(fullConfig []params.Param, name string) (params.Param,bool) {
+	for _, p := range fullConfig {
+		if p.Name() == name {
+			return p,true
+		}
+	}
+	return nil,false
+}
+
+func Parse(fullConfig []params.Param) map[string][]string {
 	r := map[string][]string{}
 	args := os.Args[1:]
 
@@ -37,7 +46,7 @@ func Parse(fullConfig map[string]params.Param) map[string][]string {
 			// If there's an equal-sign in there we split on that and use the
 			// rest as the value (if param is wanted)
 			if potName, potVal, ok := equalSignSplit(fullname); ok {
-				if param, ok := fullConfig[potName]; ok {
+				if param, ok := getParam(fullConfig, potName); ok {
 					if !param.CLAHasValue() {
 						potVal = ""
 					}
@@ -45,7 +54,7 @@ func Parse(fullConfig map[string]params.Param) map[string][]string {
 				}
 
 				// Otherwise check if this full key is wanted. If so process it.
-			} else if param, ok := fullConfig[fullname]; ok {
+			} else if param, ok := getParam(fullConfig, fullname); ok {
 				val := ""
 				if param.CLAHasValue() {
 					if len(args) > i+1 {

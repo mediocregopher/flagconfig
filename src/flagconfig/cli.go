@@ -14,7 +14,7 @@ type FlagConfig struct {
 	projname      string
 	projdescr     string
 	projpostdescr string
-	fullConfig    map[string]params.Param
+	fullConfig    []params.Param
 }
 
 // New returns a FlagConfig struct. Usage of this struct is:
@@ -24,7 +24,7 @@ type FlagConfig struct {
 func New(projname string) *FlagConfig {
 	return &FlagConfig{
 		projname:   projname,
-		fullConfig: map[string]params.Param{},
+		fullConfig: make([]params.Param,0,8),
 	}
 }
 
@@ -41,25 +41,30 @@ func (f *FlagConfig) SetExtraHelp(help string) {
 }
 
 func (f *FlagConfig) get(name string) params.Param {
-	val, ok := f.fullConfig[name]
-	if !ok {
-		panic("attempted to access non-parameter " + name)
+	for _, param := range f.fullConfig {
+		if name == param.Name() {
+			return param
+		}
 	}
-	return val
+	return nil
+}
+
+func (f *FlagConfig) add(p params.Param) {
+	f.fullConfig = append(f.fullConfig, p)
 }
 
 // IntParam tells flagconfig to look for a param called name of type int in
 // either the config file or on the command line, or use the given default
 // instead
 func (f *FlagConfig) IntParam(name, descr string, def int) {
-	f.fullConfig[name] = params.NewInt(name, descr, def, false)
+	f.add(params.NewInt(name, descr, def, false))
 }
 
 // RequiredIntParam tells flagconfig to look for a param called name of type int
 // in either the config file or on the command line, or return an error from
 // Parse if it's not specified anywhere
 func (f *FlagConfig) RequiredIntParam(name, descr string) {
-	f.fullConfig[name] = params.NewInt(name, descr, 0, true)
+	f.add(params.NewInt(name, descr, 0, true))
 }
 
 // GetInt looks for a configuration parameter of the given name and
@@ -75,7 +80,7 @@ func (f *FlagConfig) GetInt(name string) int {
 // defined on the command-line, that one will be the only one in the returned
 // value.
 func (f *FlagConfig) IntParams(name, descr string, defaults ...int) {
-	f.fullConfig[name] = params.NewInts(name, descr, defaults)
+	f.add(params.NewInts(name, descr, defaults))
 }
 
 // GetInts looks for a configuration parameter of the given name and returns its
@@ -88,14 +93,14 @@ func (f *FlagConfig) GetInts(name string) []int {
 // either the config file or on the command line, or use the given default
 // instead
 func (f *FlagConfig) StrParam(name, descr, def string) {
-	f.fullConfig[name] = params.NewString(name, descr, def, false)
+	f.add(params.NewString(name, descr, def, false))
 }
 
 // RequiredStrParam tells flagconfig to look for a param called name of type
 // string in either the config file or on the command line, or return an error
 // from Parse if it's not specified anywhere
 func (f *FlagConfig) RequiredStrParam(name, descr string) {
-	f.fullConfig[name] = params.NewString(name, descr, "", true)
+	f.add(params.NewString(name, descr, "", true))
 }
 
 // GetStr looks for a configuration parameter of the given name and
@@ -111,7 +116,7 @@ func (f *FlagConfig) GetStr(name string) string {
 // defined on the command-line, that one will be the only one in the returned
 // value.
 func (f *FlagConfig) StrParams(name, descr string, defaults ...string) {
-	f.fullConfig[name] = params.NewStrings(name, descr, defaults)
+	f.add(params.NewStrings(name, descr, defaults))
 }
 
 // GetStrs looks for a configuration parameter of the given name and returns its
@@ -126,7 +131,7 @@ func (f *FlagConfig) GetStrs(name string) []string {
 // passing it on the command-line would mean true). In the configuration file
 // the value can be either "true" or "false".
 func (f *FlagConfig) FlagParam(name, descr string, def bool) {
-	f.fullConfig[name] = params.NewFlag(name, descr, def)
+	f.add(params.NewFlag(name, descr, def))
 }
 
 // GetFlag looks for a configuration parameter of the given name and returns its
@@ -138,6 +143,7 @@ func (f *FlagConfig) GetFlag(name string) bool {
 // Parse loads flagconfig's runtime configuration, using both command-line
 // arguments and a possible configuration file
 func (f *FlagConfig) Parse() error {
+	realConfig := f.fullConfig
 
 	f.FlagParam(
 		"help",
@@ -167,9 +173,7 @@ func (f *FlagConfig) Parse() error {
 		configFile = configFiles[0]
 	}
 
-	delete(f.fullConfig, "help")
-	delete(f.fullConfig, "example")
-	delete(f.fullConfig, "config")
+	f.fullConfig = realConfig
 
 	if printHelp {
 		fmt.Println(f.Help())
@@ -197,8 +201,8 @@ func (f *FlagConfig) Parse() error {
 		}
 	}
 
-	for name, param := range f.fullConfig {
-		if vals, ok := claMap[name]; ok {
+	for _, param := range f.fullConfig {
+		if vals, ok := claMap[param.Name()]; ok {
 			for i := range vals {
 				param.CLA(vals[i])
 			}
@@ -238,12 +242,12 @@ func (f *FlagConfig) Help() string {
 	fmt.Fprintf(w, fmtStr, "Flag", "Default(s)", "Description")
 	fmt.Fprintf(w, fmtStr, "~~~~", "~~~~~~~~~~", "~~~~~~~~~~~")
 
-	for name, param := range f.fullConfig {
+	for _, param := range f.fullConfig {
 		defj := "<required>"
 		if defs, ok := param.DefaultAsStrings(); ok {
 			defj = strings.Join(defs, ",")
 		}
-		fmt.Fprintf(w, fmtStr, "--"+name, defj, param.Description())
+		fmt.Fprintf(w, fmtStr, "--"+param.Name(), defj, param.Description())
 	}
 
 	w.Flush()
