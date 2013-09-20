@@ -11,7 +11,7 @@ Goatfile:
 {
     "loc":"https://github.com/mediocregopher/flagconfig.git",
     "type":"git",
-    "reference":"v0.2.0",
+    "reference":"v0.3.0",
     "path":"github.com/mediocregopher/flagconfig"
 }
 ```
