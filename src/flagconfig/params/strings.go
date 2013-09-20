@@ -10,15 +10,11 @@ type stringsParam struct {
 	finalVal                    []string
 }
 
-func NewStrings(name, description string, def []string, required bool) *stringsParam {
-	var defVal []string = nil
-	if !required {
-		defVal = def
-	}
+func NewStrings(name, description string, def []string) *stringsParam {
 	return &stringsParam{
 		name:        name,
 		description: description,
-		defaultVal:  defVal,
+		defaultVal:  def,
 	}
 }
 

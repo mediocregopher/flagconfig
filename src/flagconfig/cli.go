@@ -18,9 +18,9 @@ type FlagConfig struct {
 }
 
 // New returns a FlagConfig struct. Usage of this struct is:
-//	* Tell it what params to look for with StrParam, IntParam, etc...
-//	* Call Parse()
-//	* Get found parameters using GetStr, GetInt, etc...
+//* Tell it what params to look for with StrParam, IntParam, etc...
+//* Call Parse()
+//* Get found parameters using GetStr, GetInt, etc...
 func New(projname string) *FlagConfig {
 	return &FlagConfig{
 		projname:   projname,
@@ -55,6 +55,13 @@ func (f *FlagConfig) IntParam(name, descr string, def int) {
 	f.fullConfig[name] = params.NewInt(name, descr, def, false)
 }
 
+// RequiredIntParam tells flagconfig to look for a param called name of type int
+// in either the config file or on the command line, or return an error from
+// Parse if it's not specified anywhere
+func (f *FlagConfig) RequiredIntParam(name, descr string) {
+	f.fullConfig[name] = params.NewInt(name, descr, 0, true)
+}
+
 // GetInt looks for a configuration parameter of the given name and
 // returns its value (assuming the parameter is an integer)
 func (f *FlagConfig) GetInt(name string) int {
@@ -66,6 +73,13 @@ func (f *FlagConfig) GetInt(name string) int {
 // instead
 func (f *FlagConfig) StrParam(name, descr, def string) {
 	f.fullConfig[name] = params.NewString(name, descr, def, false)
+}
+
+// RequiredStrParam tells flagconfig to look for a param called name of type
+// string in either the config file or on the command line, or return an error
+// from Parse if it's not specified anywhere
+func (f *FlagConfig) RequiredStrParam(name, descr string) {
+	f.fullConfig[name] = params.NewString(name, descr, "", true)
 }
 
 // GetStr looks for a configuration parameter of the given name and
@@ -80,8 +94,8 @@ func (f *FlagConfig) GetStr(name string) string {
 // other. For example, if there are three defined in the config file and one
 // defined on the command-line, that one will be the only one in the returned
 // value.
-func (f *FlagConfig) StrParams(name, descr string, def ...string) {
-	f.fullConfig[name] = params.NewStrings(name, descr, def, false)
+func (f *FlagConfig) StrParams(name, descr string, defaults ...string) {
+	f.fullConfig[name] = params.NewStrings(name, descr, defaults)
 }
 
 // GetStrs looks for a configuration parameter of the given name and returns its

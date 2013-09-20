@@ -18,6 +18,7 @@ func main() {
 	FC.IntParam("bar","Some bar",64)
 	FC.StrParams("baz","Some baz","a","b","c")
 	FC.FlagParam("bax", "Some bax", false)
+	FC.RequiredIntParam("baw","Some baw")
 
 	//Optionally set a message to show up at the end of the --help message
 	FC.SetExtraHelp("Thanks for reading the --help message!")
@@ -34,4 +35,5 @@ func main() {
 	fmt.Println(FC.GetInt("bar"))
 	fmt.Println(FC.GetStrs("baz"))
 	fmt.Println(FC.GetFlag("bax"))
+	fmt.Println(FC.GetInt("baw"))
 }
