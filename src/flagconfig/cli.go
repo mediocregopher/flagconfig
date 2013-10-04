@@ -173,12 +173,12 @@ func (f *FlagConfig) Parse() error {
 		configFile = configFiles[0]
 	}
 
-	f.fullConfig = realConfig
-
 	if printHelp {
 		fmt.Println(f.Help())
 		os.Exit(0)
 	}
+
+	f.fullConfig = realConfig
 
 	//If the flag to dump example config is set to true, do that
 	if printExample {
