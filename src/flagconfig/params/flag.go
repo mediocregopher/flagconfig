@@ -31,11 +31,7 @@ func (p *flagParam) Description() string {
 
 func (p *flagParam) DefaultAsStrings() ([]string, bool) {
 	if p.defaultVal != nil {
-		if *p.defaultVal {
-			return []string{"true"}, true
-		} else {
-			return []string{"false"}, true
-		}
+		return []string{""}, true
 	} else {
 		return nil, false
 	}
