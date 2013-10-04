@@ -33,7 +33,7 @@ func (p *stringParam) Description() string {
 
 func (p *stringParam) DefaultAsStrings() ([]string, bool) {
 	if p.defaultVal != nil {
-		return []string{"\"" + *p.defaultVal + "\""}, true
+		return []string{*p.defaultVal}, true
 	} else {
 		return nil, false
 	}

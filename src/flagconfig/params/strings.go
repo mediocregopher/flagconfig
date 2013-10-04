@@ -28,11 +28,7 @@ func (p *stringsParam) Description() string {
 
 func (p *stringsParam) DefaultAsStrings() ([]string, bool) {
 	if p.defaultVal != nil {
-		defs := make([]string, len(p.defaultVal))
-		for i := range p.defaultVal {
-			defs[i] = "\"" + p.defaultVal[i] + "\""
-		}
-		return defs, true
+		return p.defaultVal, true
 	} else {
 		return nil, false
 	}
