@@ -35,8 +35,10 @@ func getParam(fullConfig []params.Param, name string) (params.Param,bool) {
 	return nil,false
 }
 
-func Parse(fullConfig []params.Param) map[string][]string {
+func Parse(fullConfig []params.Param) (map[string][]string, []string) {
 	r := map[string][]string{}
+	pos := make([]string, 0, 2)
+
 	args := os.Args[1:]
 
 	for i := 0; i < len(args); i++ {
@@ -53,7 +55,7 @@ func Parse(fullConfig []params.Param) map[string][]string {
 					setAppend(r, potName, potVal)
 				}
 
-				// Otherwise check if this full key is wanted. If so process it.
+			// Otherwise check if this full key is wanted. If so process it.
 			} else if param, ok := getParam(fullConfig, fullname); ok {
 				val := ""
 				if param.CLAHasValue() {
@@ -65,9 +67,13 @@ func Parse(fullConfig []params.Param) map[string][]string {
 					}
 				}
 				setAppend(r, fullname, val)
+			} else {
+				pos = append(pos, args[i])
 			}
+		} else {
+			pos = append(pos, args[i])
 		}
 	}
 
-	return r
+	return r, pos
 }

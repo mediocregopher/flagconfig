@@ -38,4 +38,5 @@ func main() {
 	fmt.Println(FC.GetFlag("bax"))
 	fmt.Println(FC.GetInt("baw"))
 	fmt.Println(FC.GetInts("baq"))
+	fmt.Println(FC.GetPositionals())
 }

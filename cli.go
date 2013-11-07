@@ -15,6 +15,7 @@ type FlagConfig struct {
 	projdescr     string
 	projpostdescr string
 	fullConfig    []params.Param
+	pos           []string
 	noConfig      bool
 }
 
@@ -167,7 +168,8 @@ func (f *FlagConfig) Parse() error {
 		)
 	}
 
-	claMap := cla.Parse(f.fullConfig)
+	claMap, pos := cla.Parse(f.fullConfig)
+	f.pos = pos
 	_, printHelp := claMap["help"]
 	_, printExample := claMap["example"]
 
@@ -266,4 +268,11 @@ func (f *FlagConfig) Help() string {
 // file. The --config and --example options won't be present in the --help menu.
 func (f *FlagConfig) DisallowConfig() {
 	f.noConfig = true
+}
+
+// GetPositionals returns all positional arguments found after Parse'ing. Will
+// return empty slice if none were found, and nil if Parse hasn't been called
+// yet
+func (f *FlagConfig) GetPositionals() []string {
+	return f.pos
 }
