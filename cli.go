@@ -15,6 +15,7 @@ type FlagConfig struct {
 	projdescr     string
 	projpostdescr string
 	fullConfig    []params.Param
+	noConfig      bool
 }
 
 // New returns a FlagConfig struct. Usage of this struct is:
@@ -151,18 +152,20 @@ func (f *FlagConfig) Parse() error {
 		false,
 	)
 
-	f.FlagParam(
-		"example",
-		"Dump example configuration to stdout and exit",
-		false,
-	)
+	if !f.noConfig {
+		f.FlagParam(
+			"example",
+			"Dump example configuration to stdout and exit",
+			false,
+		)
 
-	f.StrParam(
-		"config",
-		"Configuration file to load, empty means don't load any file and only"+
-			" use command-line args",
-		"",
-	)
+		f.StrParam(
+			"config",
+			"Configuration file to load, empty means don't load any file and"+
+			" only use command-line args",
+			"",
+		)
+	}
 
 	claMap := cla.Parse(f.fullConfig)
 	_, printHelp := claMap["help"]
@@ -257,4 +260,10 @@ func (f *FlagConfig) Help() string {
 	}
 
 	return buf.String()
+}
+
+// If called then flagconfig won't have the ability to read in a configuration
+// file. The --config and --example options won't be present in the --help menu.
+func (f *FlagConfig) DisallowConfig() {
+	f.noConfig = true
 }
