@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/mediocregopher/flagconfig/src/flagconfig"
+	"github.com/mediocregopher/flagconfig"
 	"fmt"
 )
 

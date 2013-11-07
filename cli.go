@@ -3,8 +3,8 @@ package flagconfig
 import (
 	"bytes"
 	"fmt"
-	"github.com/mediocregopher/flagconfig/src/flagconfig/cla"
-	"github.com/mediocregopher/flagconfig/src/flagconfig/params"
+	"github.com/mediocregopher/flagconfig/cla"
+	"github.com/mediocregopher/flagconfig/params"
 	"os"
 	"strings"
 	"text/tabwriter"

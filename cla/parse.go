@@ -1,7 +1,7 @@
 package cla
 
 import (
-	"github.com/mediocregopher/flagconfig/src/flagconfig/params"
+	"github.com/mediocregopher/flagconfig/params"
 	"os"
 	"strings"
 )
