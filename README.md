@@ -26,6 +26,6 @@ Godocs can be found
 
 See the [example][example] for basic usage.
 
-[godocs]: http://godoc.org/github.com/mediocregopher/flagconfig/src/flagconfig
+[godocs]: http://godoc.org/github.com/mediocregopher/flagconfig
 [example]: /example
 [goat]: https://github.com/mediocregopher/goat
