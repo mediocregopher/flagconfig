@@ -12,6 +12,9 @@ type intsParam struct {
 }
 
 func NewInts(name, description string, def []int) *intsParam {
+	if def == nil {
+		def = []int{}
+	}
 	return &intsParam{
 		name:        name,
 		description: description,

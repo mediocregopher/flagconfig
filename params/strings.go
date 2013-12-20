@@ -11,6 +11,9 @@ type stringsParam struct {
 }
 
 func NewStrings(name, description string, def []string) *stringsParam {
+	if def == nil {
+		def = []string{}
+	}
 	return &stringsParam{
 		name:        name,
 		description: description,
