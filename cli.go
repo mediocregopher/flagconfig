@@ -254,7 +254,7 @@ func (f *FlagConfig) Help() string {
 	for _, param := range f.fullConfig {
 		defj := "<required>"
 		if defs, ok := param.DefaultAsStrings(); ok {
-			defj = strings.Join(defs, ",")
+			defj = strings.Join(defs, ", ")
 		}
 		_, err := fmt.Fprintf(
 			w, fmtStr,
