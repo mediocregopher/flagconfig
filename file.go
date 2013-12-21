@@ -22,8 +22,12 @@ func (f *FlagConfig) dumpExampleConfig(projname string) string {
 	for _, param := range f.fullConfig {
 		buffer.WriteString("# " + param.Description() + "\n")
 		if defaults, ok := param.DefaultAsStrings(); ok {
-			for i := range defaults {
-				buffer.WriteString(param.Name() + ": " + defaults[i] + "\n")
+			if len(defaults) > 0 {
+				for i := range defaults {
+					buffer.WriteString(param.Name() + ": " + defaults[i] + "\n")
+				}
+			} else {
+				buffer.WriteString("# " + param.Name() + ": <something>\n")
 			}
 		} else {
 			buffer.WriteString(param.Name() + ": <required>\n")
