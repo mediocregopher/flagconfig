@@ -1,2 +1,7 @@
 ---
 path: github.com/mediocregopher/flagconfig
+deps:
+    - loc: https://github.com/mediocregopher/tablewriter.git
+      type: git
+      ref: v0.0.0
+      path: github.com/mediocregopher/tablewriter

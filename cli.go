@@ -7,7 +7,7 @@ import (
 	"github.com/mediocregopher/flagconfig/params"
 	"os"
 	"strings"
-	"text/tabwriter"
+	"github.com/mediocregopher/tablewriter"
 )
 
 type FlagConfig struct {
@@ -240,8 +240,12 @@ func (f *FlagConfig) Help() string {
 
 	fmt.Fprintf(buf, "\n")
 
-	w := new(tabwriter.Writer)
-	w.Init(buf, 0, 8, 0, '\t', 0)
+	w := tablewriter.New(buf)
+	w.SetTableWidth(150)
+	w.SetBottomPadding(0)
+	w.AddColumn(-1, 25)
+	w.AddColumn(-1, 30)
+	w.AddColumn(0, -1)
 
 	fmtStr := "%s\t%s\t%s\n"
 	fmt.Fprintf(w, fmtStr, "Flag", "Default(s)", "Description")
@@ -252,10 +256,16 @@ func (f *FlagConfig) Help() string {
 		if defs, ok := param.DefaultAsStrings(); ok {
 			defj = strings.Join(defs, ",")
 		}
-		fmt.Fprintf(w, fmtStr, "--"+param.Name(), defj, param.Description())
+		_, err := fmt.Fprintf(
+			w, fmtStr,
+			"--"+param.Name(),
+			defj,
+			param.Description(),
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR printing help: %s\n", err)
+		}
 	}
-
-	w.Flush()
 
 	if f.projpostdescr != "" {
 		fmt.Fprintf(buf, "\n%s\n", f.projpostdescr)
