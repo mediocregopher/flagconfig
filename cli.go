@@ -16,7 +16,16 @@ type FlagConfig struct {
 	projpostdescr string
 	fullConfig    []params.Param
 	pos           []string
-	noConfig      bool
+
+	// if true, don't use configuration file at all
+	forceNoConfig bool
+
+	// if true and a config file is set but doesn't exist, continue and don't
+	// error
+	ignoreMissingConfig bool
+
+	// the file to use as a config file by default
+	defaultConfigFile string
 }
 
 // New returns a FlagConfig struct. Usage of this struct is:
@@ -153,7 +162,7 @@ func (f *FlagConfig) Parse() error {
 		false,
 	)
 
-	if !f.noConfig {
+	if !f.forceNoConfig {
 		f.FlagParam(
 			"example",
 			"Dump example configuration to stdout and exit",
@@ -164,7 +173,7 @@ func (f *FlagConfig) Parse() error {
 			"config",
 			"Configuration file to load, empty means don't load any file and"+
 			" only use command-line args",
-			"",
+			f.defaultConfigFile,
 		)
 	}
 
@@ -176,6 +185,8 @@ func (f *FlagConfig) Parse() error {
 	var configFile string
 	if configFiles, ok := claMap["config"]; ok && len(configFiles) > 0 {
 		configFile = configFiles[0]
+	} else if f.defaultConfigFile != "" {
+		configFile = f.defaultConfigFile
 	}
 
 	if printHelp {
@@ -194,7 +205,10 @@ func (f *FlagConfig) Parse() error {
 	if configFile != "" {
 		configFileMap, err := readConfig(configFile)
 		if err != nil {
-			return err
+			// configFileMap isn't nil when the file couldn't be opened
+			if !(configFileMap != nil && f.ignoreMissingConfig) {
+				return err
+			}
 		}
 
 		for _, param := range f.fullConfig {
@@ -277,7 +291,21 @@ func (f *FlagConfig) Help() string {
 // If called then flagconfig won't have the ability to read in a configuration
 // file. The --config and --example options won't be present in the --help menu.
 func (f *FlagConfig) DisallowConfig() {
-	f.noConfig = true
+	f.forceNoConfig = true
+}
+
+// If set, this will become the default value for the --config parameter. Note
+// that this will still generate an error if it's set but the file doesn't
+// exist. Use IgnoreMissingConfigFile to have this not be the case.
+func (f *FlagConfig) SetDefaultConfigFile(file string) {
+	f.defaultConfigFile = file
+}
+
+// If called then flagconfig won't stop execution if it's given a configuration
+// file to read but there isn't a file there. Instead it will act as if the file
+// was empty.
+func (f *FlagConfig) IgnoreMissingConfigFile() {
+	f.ignoreMissingConfig = true
 }
 
 // GetPositionals returns all positional arguments found after Parse'ing. Will

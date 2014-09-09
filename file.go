@@ -49,12 +49,12 @@ func setOrAppend(m map[string][]string, name, val string) {
 // that parsing is done elsewhere
 func readConfig(file string) (map[string][]string, error) {
 	fi, err := os.Open(file)
+	ret := map[string][]string{}
 	if err != nil {
-		return nil, err
+		return ret, err
 	}
 
 	r := bufio.NewReader(fi)
-	ret := map[string][]string{}
 	for {
 		line, err := r.ReadString('\n')
 		if err == io.EOF {
