@@ -20,6 +20,10 @@ func (f *FlagConfig) dumpExampleConfig(projname string) string {
 	buffer.WriteString("\n")
 
 	for _, param := range f.fullConfig {
+		switch param.Name() {
+		case "example", "config", "help":
+			continue
+		}
 		buffer.WriteString("# " + param.Description() + "\n")
 		if defaults, ok := param.DefaultAsStrings(); ok {
 			if len(defaults) > 0 {

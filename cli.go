@@ -154,8 +154,6 @@ func (f *FlagConfig) GetFlag(name string) bool {
 // Parse loads flagconfig's runtime configuration, using both command-line
 // arguments and a possible configuration file
 func (f *FlagConfig) Parse() error {
-	realConfig := f.fullConfig
-
 	f.FlagParam(
 		"help",
 		"Display help for parameters",
@@ -193,8 +191,6 @@ func (f *FlagConfig) Parse() error {
 		fmt.Println(f.Help())
 		os.Exit(0)
 	}
-
-	f.fullConfig = realConfig
 
 	//If the flag to dump example config is set to true, do that
 	if printExample {
