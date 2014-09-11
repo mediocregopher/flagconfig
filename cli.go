@@ -6,6 +6,7 @@ import (
 	"github.com/mediocregopher/flagconfig/cla"
 	"github.com/mediocregopher/flagconfig/params"
 	"os"
+	"os/user"
 	"strings"
 	"github.com/mediocregopher/tablewriter"
 )
@@ -216,6 +217,17 @@ func (f *FlagConfig) Parse() error {
 	}
 
 	if configFile != "" {
+
+		if configFile[:2] == "~/" {
+			u, err := user.Current()
+			if err != nil {
+				return err
+			}
+			home := u.HomeDir
+			configFile = strings.Replace(configFile, "~", home, 1)
+		}
+
+
 		configFileMap, err := readConfig(configFile)
 		if err != nil {
 			// configFileMap isn't nil when the file couldn't be opened
