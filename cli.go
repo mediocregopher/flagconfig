@@ -16,6 +16,7 @@ type FlagConfig struct {
 	projpostdescr string
 	fullConfig    []params.Param
 	pos           []string
+	delim         string
 
 	// if true, don't use configuration file at all
 	forceNoConfig bool
@@ -26,6 +27,9 @@ type FlagConfig struct {
 
 	// the file to use as a config file by default
 	defaultConfigFile string
+
+	// if true we don't print usage on Help()
+	dontPrintUsage bool
 }
 
 // New returns a FlagConfig struct. Usage of this struct is:
@@ -36,6 +40,7 @@ func New(projname string) *FlagConfig {
 	return &FlagConfig{
 		projname:   projname,
 		fullConfig: make([]params.Param,0,8),
+		delim:      "--",
 	}
 }
 
@@ -49,6 +54,18 @@ func (f *FlagConfig) SetDescription(descr string) {
 // message, after all flags are defined. This is optional.
 func (f *FlagConfig) SetExtraHelp(help string) {
 	f.projpostdescr = help
+}
+
+// Don't print a Usage line when printing help. Use this if you want to define
+// your own usage line in SetDescription or SetExtraHelp.
+func (f *FlagConfig) DontPrintUsage() {
+	f.dontPrintUsage = true
+}
+
+// Set the argument delimiter which identifies and argument as being a flag.
+// Default is -- (--username, for example).
+func (f *FlagConfig) SetDelimiter(delim string) {
+	f.delim = delim
 }
 
 func (f *FlagConfig) get(name string) params.Param {
@@ -175,7 +192,7 @@ func (f *FlagConfig) Parse() error {
 		)
 	}
 
-	claMap, pos := cla.Parse(f.fullConfig)
+	claMap, pos := cla.Parse(f.delim, f.fullConfig)
 	f.pos = pos
 	_, printHelp := claMap["help"]
 	_, printExample := claMap["example"]
@@ -242,7 +259,9 @@ func (f *FlagConfig) Parse() error {
 func (f *FlagConfig) Help() string {
 	buf := bytes.NewBuffer(make([]byte, 256))
 
-	fmt.Fprintf(buf, "Usage: %s [FLAGS]\n", os.Args[0])
+	if !f.dontPrintUsage {
+		fmt.Fprintf(buf, "Usage: %s [FLAGS]\n", os.Args[0])
+	}
 
 	if f.projdescr != "" {
 		fmt.Fprintf(buf, "%s\n", f.projdescr)
@@ -268,7 +287,7 @@ func (f *FlagConfig) Help() string {
 		}
 		_, err := fmt.Fprintf(
 			w, fmtStr,
-			"--"+param.Name(),
+			f.delim+param.Name(),
 			defj,
 			param.Description(),
 		)

@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-func looksLikeOpt(s string) bool {
-	return s[0] == '-' && s[1] == '-'
+func looksLikeOpt(s, delim string) bool {
+	return strings.Index(s, delim) == 0
 }
 
 func equalSignSplit(s string) (string, string, bool) {
@@ -35,15 +35,16 @@ func getParam(fullConfig []params.Param, name string) (params.Param,bool) {
 	return nil,false
 }
 
-func Parse(fullConfig []params.Param) (map[string][]string, []string) {
+func Parse(delim string, fullConfig []params.Param) (map[string][]string, []string) {
 	r := map[string][]string{}
 	pos := make([]string, 0, 2)
+	delimL := len(delim)
 
 	args := os.Args[1:]
 
 	for i := 0; i < len(args); i++ {
-		if looksLikeOpt(args[i]) {
-			fullname := args[i][2:]
+		if looksLikeOpt(args[i], delim) {
+			fullname := args[i][delimL:]
 
 			// If there's an equal-sign in there we split on that and use the
 			// rest as the value (if param is wanted)
