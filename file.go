@@ -20,8 +20,7 @@ func (f *FlagConfig) dumpExampleConfig(projname string) string {
 	buffer.WriteString("\n")
 
 	for _, param := range f.fullConfig {
-		switch param.Name() {
-		case "example", "config", "help":
+		if _, ok := f.cliOnly[param.Name()]; ok {
 			continue
 		}
 		buffer.WriteString("# " + param.Description() + "\n")

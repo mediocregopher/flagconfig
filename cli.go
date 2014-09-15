@@ -31,6 +31,8 @@ type FlagConfig struct {
 
 	// if true we don't print usage on Help()
 	dontPrintUsage bool
+
+	cliOnly map[string]bool
 }
 
 // New returns a FlagConfig struct. Usage of this struct is:
@@ -42,6 +44,11 @@ func New(projname string) *FlagConfig {
 		projname:   projname,
 		fullConfig: make([]params.Param,0,8),
 		delim:      "--",
+		cliOnly:    map[string]bool{
+			"example": true,
+			"config": true,
+			"help": true,
+		},
 	}
 }
 
@@ -67,6 +74,14 @@ func (f *FlagConfig) DontPrintUsage() {
 // Default is -- (--username, for example).
 func (f *FlagConfig) SetDelimiter(delim string) {
 	f.delim = delim
+}
+
+// Sets the given field names to be cli-only. They will not be shown in the
+// -example output. Can be called multiple times
+func (f *FlagConfig) CLIOnly(fields ...string) {
+	for i := range fields {
+		f.cliOnly[fields[i]] = true
+	}
 }
 
 func (f *FlagConfig) get(name string) params.Param {
