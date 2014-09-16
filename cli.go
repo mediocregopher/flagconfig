@@ -6,7 +6,6 @@ import (
 	"github.com/mediocregopher/flagconfig/cla"
 	"github.com/mediocregopher/flagconfig/params"
 	"os"
-	"os/user"
 	"strings"
 	"github.com/mediocregopher/tablewriter"
 )
@@ -234,13 +233,9 @@ func (f *FlagConfig) Parse() error {
 	if configFile != "" {
 
 		if configFile[:2] == "~/" {
-			var home string
-			u, err := user.Current()
-			if err == nil {
-				home = u.HomeDir
-			} else {
-				home = os.Getenv("HOME")
-			}
+			// We don't use os/user because it's not supported by osx or
+			// windows, but this is (usually, I think)
+			home := os.Getenv("HOME")
 			if home == "" {
 				return fmt.Errorf("Could not determine home directory. Please set the $HOME environment variable")
 			}
