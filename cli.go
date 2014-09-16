@@ -234,11 +234,16 @@ func (f *FlagConfig) Parse() error {
 	if configFile != "" {
 
 		if configFile[:2] == "~/" {
+			var home string
 			u, err := user.Current()
-			if err != nil {
-				return err
+			if err == nil {
+				home = u.HomeDir
+			} else {
+				home = os.Getenv("HOME")
 			}
-			home := u.HomeDir
+			if home == "" {
+				return fmt.Errorf("Could not determine home directory. Please set the $HOME environment variable")
+			}
 			configFile = strings.Replace(configFile, "~", home, 1)
 		}
 
