@@ -10,7 +10,7 @@ Also does auto-generation of configuration files with default values set.
 ```yaml
     - loc: https://github.com/mediocregopher/flagconfig.git
       type: git
-      ref: v0.4.2
+      ref: v0.5.0
       path: github.com/mediocregopher/flagconfig
 ```
 
